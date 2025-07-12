@@ -1,0 +1,32 @@
+# Java build
+target/
+*.class
+
+# Node modules
+node_modules/
+
+# VSCode workspace
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Secrets and runtime data
+.env
+tokens/
+upload_history.txt
+
+# Final or temporary media
+*.mp4
+*.mp3
+*.json
+*.log
+*.wav
+
+# Captions and output files
+remotion-captions.json
+
+#  ignore pending/archive content
+Channels/**/pending/
+Channels/**/archive/
