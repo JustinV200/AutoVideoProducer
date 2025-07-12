@@ -1,6 +1,6 @@
 # AutoVideoProducer - Local version
 
-# Personal project I made in June 2025 and uploaded July 2025 to git for archival purposes 
+Personal project I made in June 2025 and uploaded July 2025 to git for archival purposes 
 
 **AutoVideoProducer** is a scalable, multi-channel, AI-driven YouTube Shorts generation and publishing system.
 
