@@ -36,6 +36,8 @@ Built in Java + Node.js, it:
 
 ---
 
+
+
 ## Environment Setup
 
 ### 1. Java Setup
@@ -46,3 +48,18 @@ Built in Java + Node.js, it:
 ```bash
 cd vidRenderer
 npm install
+
+## 🧱 Project Structure
+
+```plaintext
+AutoVideoProducer/
+├── Channels/                    # Output folders (1 per channel)
+│   └── Channel_1/
+│       ├── pending/            # MP4s waiting to upload
+│       ├── archive/            # Uploaded MP4s
+│       └── upload_history.txt
+├── tokens/                     # YouTube OAuth2 token cache (per client ID)
+├── uploadManager/             # Java module for scheduling + uploading
+├── videoBuilder/              # Java module for script → video generation
+├── vidRenderer/               # Remotion/React component
+└── pom.xml                    # Maven project definition
