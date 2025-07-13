@@ -30,3 +30,12 @@ remotion-captions.json
 #  ignore pending/archive content
 Channels/**/pending/
 Channels/**/archive/
+
+
+node_modules
+dist
+.DS_Store
+.env
+
+# Ignore the output video from Git but not videos you import into src/.
+out
