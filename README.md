@@ -48,6 +48,7 @@ Built in Java + Node.js, it:
 ```bash
 cd vidRenderer
 npm install
+```
 
 ## 🧱 Project Structure
 
