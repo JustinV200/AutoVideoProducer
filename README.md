@@ -1,4 +1,4 @@
-# AutoVideoProducer - Local version
+# AutoVideoProducer
 
 Personal project I made in June 2025 and uploaded July 2025 to git for archival purposes 
 
@@ -16,7 +16,7 @@ Built in Java + Node.js, it:
 - Concurrent channel management (5+ channels)
 -  GPT-4o-based story/script generation per channel prompt
 -  OpenAI TTS (`shimmer` voice) → MP3
--  Whisper → accurate timestamped transcription
+-  Whisper → accurate timestamped transcription for captions
 - Remotion (React) → final rendered .mp4
 - Upload rotation every 3 hours per channel
 - All credentials loaded via environment variables
