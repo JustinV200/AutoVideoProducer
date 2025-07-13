@@ -1,4 +1,4 @@
-# AutoVideoProducer
+# AutoVideoProducer - Developed July 2025
 
 Personal project I made in June 2025 and uploaded July 2025 to git for archival purposes 
 
