@@ -59,7 +59,6 @@ AutoVideoProducer/
 │       ├── pending/            # MP4s waiting to upload
 │       ├── archive/            # Uploaded MP4s
 │       └── upload_history.txt
-├── tokens/                     # YouTube OAuth2 token cache (per client ID)
 ├── uploadManager/             # Java module for scheduling + uploading
 ├── videoBuilder/              # Java module for script → video generation
 ├── vidRenderer/               # Remotion/React component
