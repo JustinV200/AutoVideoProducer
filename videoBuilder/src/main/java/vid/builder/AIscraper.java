@@ -39,7 +39,6 @@ public class AIscraper {
                 .POST(BodyPublishers.ofString(payload.toString()))
                 .build();
 
-            // ← use 'req' here, not 'request'
             HttpResponse<String> response = httpClient.send(
                 req,
                 HttpResponse.BodyHandlers.ofString()
