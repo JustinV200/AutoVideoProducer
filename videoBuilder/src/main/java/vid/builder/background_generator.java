@@ -45,14 +45,14 @@ public class background_generator {
         String videoPath,
         String audioPath,
         String outputPath,
-        String startOffset  // seconds as string, or null for start
+        String startOffset  
     ) {
         try {
-            // 1) Measure how long the speech is:
+            //  Measure how long the speech is:
             double duration = getAudioDurationSec(audioPath);
             String durationStr = String.format(Locale.US, "%.3f", duration);
 
-            // 2) Build ffmpeg command
+            // Build ffmpeg command
             var cmd = new java.util.ArrayList<String>();
             cmd.add("ffmpeg");
             cmd.add("-y");  // overwrite existing
@@ -65,18 +65,18 @@ public class background_generator {
             cmd.add("-t");
             cmd.add(durationStr);
 
-            // 3) Re-encode video + strip audio:
+            // Re-encode video + strip audio:
             cmd.addAll(List.of(
                 "-c:v", "libx264",
                 "-preset", "fast",
                 "-profile:v", "baseline",
                 "-pix_fmt", "yuv420p",
                 "-movflags", "+faststart",
-                "-an",               //  drop audio track entirely
+                "-an",               //  drop audio track
                 outputPath
             ));
 
-            // 4) Run it
+            // Run it
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.redirectErrorStream(true);
             Process proc = pb.start();
