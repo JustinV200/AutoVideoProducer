@@ -1,6 +1,5 @@
 package vid.builder;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -49,14 +48,14 @@ public class Renderer {
 
       // call Remotion:
       ProcessBuilder pb = new ProcessBuilder(
-        "C:\\Program Files\\nodejs\\npx.cmd",
+        AppPaths.NPX,
         "remotion",
         "render",
         "CaptionedShort",           // composition ID
         outputPathStr,              // output .mp4
         "--props=" + propsPath      // captions JSON
       );
-      pb.directory(new File("D:/autoVideoProducer/vidRenderer"));
+      pb.directory(AppPaths.VIDRENDERER_DIR.toFile());
       pb.inheritIO();
 
       // run and check exit code

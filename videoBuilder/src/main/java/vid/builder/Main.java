@@ -160,9 +160,7 @@ Requirements:
       String basePrompt = channelPrompts.get(channelName);
 
       // read history so you don’t repeat stories
-      String history = readUploadHistory(
-        Path.of("D:/AutoVideoProducer/Channels", channelName, "upload_history.txt")
-      );
+      String history = readUploadHistory(AppPaths.historyFile(channelName));
 
       for (int i = 0; i < repeatCount; i++) {
         String fullPrompt = buildPrompt(basePrompt, history);
@@ -212,23 +210,22 @@ Requirements:
 
     System.out.println("  • Generating script…");
     SearchResult script = builder.scriptWriter(prompt);
-    System.out.println("    title: " + script.title);
-    System.out.println("    text : " + script.text);
+    System.out.println("    title: " + script.title());
+    System.out.println("    text : " + script.text());
 
     System.out.println("  • Generating audio…");
-    builder.voiceAct(script.text);
+    builder.voiceAct(script.text());
 
     System.out.println("  • Generating background clip…");
-    builder.generate_background(channelName);
+    builder.generateBackground();
 
     System.out.println("  • Generating captions…");
-    builder.generate_captions();
+    builder.generateCaptions();
 
     System.out.println("  • Rendering final video…");
-    Path captionsJson = Path.of("D:/autoVideoProducer/vidRenderer/src/remotion-captions.json");
-    Path pendingDir   = Path.of("D:/autoVideoProducer/Channels", channelName, "pending");
-    Renderer.renderFinalVideo(captionsJson.toString(), pendingDir.toString());
+    Path pendingDir = AppPaths.pendingDir(channelName);
+    Renderer.renderFinalVideo(AppPaths.CAPTIONS_JSON.toString(), pendingDir.toString());
 
-    System.out.println("✅ Video rendered → “" + pendingDir + "”\n");
+    System.out.println("✅ Video rendered → " + pendingDir + "\n");
   }
 }

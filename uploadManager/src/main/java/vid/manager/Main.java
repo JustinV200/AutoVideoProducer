@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import vid.builder.AppPaths;
 import vid.builder.Env;
 
 /**
@@ -51,7 +52,7 @@ public class Main {
 
   public static void main(String[] args) throws Exception {
     // Root folder that holds one subdirectory per channel.
-    Path channelsRoot = Path.of("D:/AutoVideoProducer/Channels");
+    Path channelsRoot = AppPaths.CHANNELS_ROOT;
 
     // Per-channel credentials. Populate the matching keys in .env.
     Map<String, ChannelConfig> channels = Map.of(
@@ -144,7 +145,7 @@ public class Main {
       }
         for (var entry : channels.entrySet()) {
         String channelName = entry.getKey();
-        Path pendingDir = Path.of("D:/AutoVideoProducer/Channels").resolve(channelName).resolve("pending");
+        Path pendingDir = AppPaths.pendingDir(channelName);
 
         try {
           List<Path> videos = Files.list(pendingDir)

@@ -7,28 +7,28 @@ node_modules/
 dist/
 out/
 
-# VSCode workspace
+# IDE / editor
 .vscode/
+.idea/
+*.iml
 
 # OS junk
 .DS_Store
 Thumbs.db
 
-# Secrets and runtime data
+# Secrets and OAuth tokens
 .env
 tokens/
+
+# Per-channel runtime data
 upload_history.txt
-
-# Final or temporary media
-*.mp4
-*.mp3
-*.json
-*.log
-*.wav
-
-# Captions and output files
-remotion-captions.json
-
-# Ignore pending/archive content
 Channels/**/pending/
 Channels/**/archive/
+
+# Generated media (live under vidRenderer/public and Channels/**)
+vidRenderer/public/speech.mp3
+vidRenderer/public/backgroundclip.mp4
+vidRenderer/src/remotion-captions.json
+
+# Log files
+*.log
