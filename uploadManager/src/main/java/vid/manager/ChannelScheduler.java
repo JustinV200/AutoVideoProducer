@@ -17,6 +17,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Per-channel upload scheduler.
+ *
+ * <p>A {@code ChannelScheduler} owns the {@code pending}, {@code archive}
+ * and {@code upload_history.txt} files for a single channel and is
+ * responsible for:</p>
+ * <ul>
+ *   <li>enumerating MP4s ready for upload,</li>
+ *   <li>spacing uploads five hours apart (while honouring the timestamp of
+ *       the last successful upload),</li>
+ *   <li>invoking {@link YouTubeUploader} and moving the source file to
+ *       {@code archive/} on success,</li>
+ *   <li>rescheduling the remaining batch to the next day when YouTube
+ *       signals a daily upload-quota error.</li>
+ * </ul>
+ */
 public class ChannelScheduler {
   private final String channelName;
   private final Path pendingDir;

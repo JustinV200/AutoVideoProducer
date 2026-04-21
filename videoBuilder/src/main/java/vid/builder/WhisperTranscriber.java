@@ -1,5 +1,5 @@
 package vid.builder;
-//uses openAI's Whisper API to transcribe audio files into timestampted text portions, that is then used by the renderer to have timely captions in the final video.
+
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -8,7 +8,23 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+/**
+ * Thin client for OpenAI's Whisper speech-to-text endpoint. Produces a
+ * verbose JSON response containing timestamped segments that are later
+ * consumed by {@link VidBuilder#saveRemotionCaptions(String, String)} to
+ * drive on-screen captions in the rendered short.
+ */
 public class WhisperTranscriber {
+    /**
+     * Transcribes the audio file at {@code audioFilePath} using the
+     * {@code whisper-1} model in verbose-JSON mode so segment-level start /
+     * end timestamps are included in the response.
+     *
+     * @param audioFilePath path to the audio file (MP3) to transcribe
+     * @param API_KEY       OpenAI API key used for authentication
+     * @return the raw verbose-JSON response body, or {@code null} on failure
+     */
     public static String transcribe(String audioFilePath, String API_KEY) {
         try {
             var boundary = "----Boundary" + System.currentTimeMillis();

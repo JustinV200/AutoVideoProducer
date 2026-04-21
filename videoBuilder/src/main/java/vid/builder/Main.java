@@ -7,7 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Command-line entry point for the video-generation pipeline.
+ *
+ * <p>Usage:</p>
+ * <pre>
+ *   java vid.builder.Main &lt;channelName|all&gt; &lt;repeatCount&gt;
+ * </pre>
+ *
+ * <p>For each selected channel this class looks up the channel-specific
+ * prompt, reads the upload history so previously produced stories can be
+ * excluded, and then drives {@link VidBuilder} through the full
+ * script → TTS → background → captions → render pipeline
+ * {@code repeatCount} times.</p>
+ */
 public class Main {
   public static void main(String[] args) {
     if (args.length < 2) {

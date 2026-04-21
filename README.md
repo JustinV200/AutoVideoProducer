@@ -19,7 +19,7 @@ Built in Java + Node.js, it:
 -  Whisper → accurate timestamped transcription for captions
 - Remotion (React) → final rendered .mp4
 - Upload rotation every 3 hours per channel
-- All credentials loaded via environment variables
+- All credentials loaded from a single root `.env` file (see `.env.example`)
 
 ---
 
@@ -48,6 +48,16 @@ Built in Java + Node.js, it:
 ```bash
 cd vidRenderer
 npm install
+```
+
+### 3. Configure secrets
+Copy `.env.example` to `.env` in the repo root and fill in your OpenAI key
+and YouTube OAuth credentials. The loader (`vid.builder.Env`) picks this
+file up automatically; real process environment variables still work and
+take precedence when set.
+
+```bash
+cp .env.example .env
 ```
 
 ## Project Structure

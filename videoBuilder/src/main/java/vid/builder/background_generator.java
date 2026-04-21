@@ -1,7 +1,5 @@
-//This code breaks down long background videos into small clips equal in length to the audio duration.
-//It uses ffmpeg to clip the video and re-encode it without audio.
-
 package vid.builder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,8 +8,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+/**
+ * Utility methods that shell out to {@code ffmpeg} / {@code ffprobe} to
+ * chop long gameplay recordings into short clips the same length as the
+ * generated narration audio. The resulting clip is re-encoded with H.264
+ * baseline profile and has its audio stripped so it can be layered under
+ * the TTS track by Remotion.
+ *
+ * <p>Both {@code ffmpeg} and {@code ffprobe} must be available on
+ * {@code PATH}.</p>
+ */
 public class background_generator {
 
+    /** Returns the duration, in seconds, of the supplied audio file. */
     public static double getAudioDurationSec(String audioPath) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(
             "ffprobe", "-v", "error",
@@ -25,6 +34,7 @@ public class background_generator {
         return Double.parseDouble(new String(out).trim());
     }
 
+    /** Returns the duration, in seconds, of the supplied video file. */
     public static double getVideoDurationSec(String videoPath) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(
             "ffprobe", "-v", "error",

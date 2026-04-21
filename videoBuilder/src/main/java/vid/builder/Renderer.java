@@ -8,7 +8,22 @@ import java.nio.file.Path;
 
 import org.json.JSONArray;
 
+/**
+ * Invokes Remotion (via {@code npx remotion render}) to turn the
+ * background clip, speech audio, and captions JSON into the final MP4.
+ *
+ * <p>The output file is named after the first caption line so that the
+ * upload step can use it as the video title.</p>
+ */
 public class Renderer {
+  /**
+   * Renders the {@code CaptionedShort} composition to an MP4 in
+   * {@code outputDirectory}, using the captions at {@code captionsJsonPath}
+   * as the Remotion input props.
+   *
+   * @param captionsJsonPath path to a Remotion captions JSON file
+   * @param outputDirectory  directory where the final MP4 will be written
+   */
   public static void renderFinalVideo(String captionsJsonPath, String outputDirectory) {
     try {
       //  Read captions, grab first line for filename

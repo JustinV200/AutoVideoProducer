@@ -1,5 +1,5 @@
 package vid.builder;
-// This class uses OpenAI's GPT-4o to scrape web search results and extract titles and text. Creating the video script. Prompts can be found in Main.java
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,8 +9,19 @@ import java.net.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Thin wrapper around the OpenAI GPT-4o Responses API with the
+ * {@code web_search_preview} tool enabled. Given a natural-language prompt,
+ * {@link #search(String)} returns a {@link SearchResult} holding the title
+ * and body text used as the script for a video.
+ *
+ * <p>The {@code OPENAI_API_KEY} value is read via {@link Env}, so it may be
+ * supplied through either a project-root {@code .env} file or a real
+ * environment variable. Prompts for each channel live in
+ * {@link Main}.</p>
+ */
 public class AIscraper {
-    private static final String API_KEY = System.getenv("OPENAI_API_KEY");
+    private static final String API_KEY = Env.get("OPENAI_API_KEY");
     private static final String ENDPOINT = "https://api.openai.com/v1/responses";
 
     private final HttpClient httpClient;

@@ -16,50 +16,71 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
+import vid.builder.Env;
+
 /**
- * Orchestrates scanning each channel folder, scheduling uploads every 3hrs,
- * and then letting ChannelScheduler handle each upload+archive step.
+ * Entry point for the upload side of AutoVideoProducer.
+ *
+ * <p>For every configured channel this class:</p>
+ * <ul>
+ *   <li>Watches the {@code Channels/&lt;name&gt;/pending} folder for finished
+ *       MP4s.</li>
+ *   <li>Triggers {@link vid.builder.Main} to generate additional videos when
+ *       the pending queue drops below five clips.</li>
+ *   <li>Delegates actual uploading and archiving to a per-channel
+ *       {@link ChannelScheduler}, spacing uploads five hours apart.</li>
+ * </ul>
+ *
+ * <p>Credentials are read through {@link Env} so they may be supplied from a
+ * project-root {@code .env} file or from real process environment variables.
+ * See {@code .env.example} for the full list of required keys.</p>
  */
 public class Main {
-  // Simple holder for client-ID & secret per channel 
-    public record ChannelConfig(String clientId,
+  /**
+   * Per-channel OAuth credentials. A separate client ID/secret pair is used
+   * for each channel so uploads can run in parallel without hitting a single
+   * API quota.
+   */
+  public record ChannelConfig(String clientId,
                               String clientSecret,
                               String email) {}
+
   private static final Map<String, Instant> nextScheduledMap = new ConcurrentHashMap<>();
   private static final Set<Path> scheduledVideos = ConcurrentHashMap.newKeySet();
 
   public static void main(String[] args) throws Exception {
-    // where all channels are stored
+    // Root folder that holds one subdirectory per channel.
     Path channelsRoot = Path.of("D:/AutoVideoProducer/Channels");
 
-    //multiple CLIENTIDs and secrets are used to avoid rate limiting issues, and to allow multiple channels to be run at once.
-    Map<String,ChannelConfig> channels = Map.of(
+    // Per-channel credentials. Populate the matching keys in .env.
+    Map<String, ChannelConfig> channels = Map.of(
       "Channel_1", new ChannelConfig(
-        System.getenv("CHANNEL_1_CLIENT_ID"),
-        System.getenv("CHANNEL_1_CLIENT_SECRET"),
-        System.getenv("CHANNEL_1_EMAIL")
-      ),   "Channel_2", new ChannelConfig(
-        System.getenv("CHANNEL_2_CLIENT_ID"),
-        System.getenv("CHANNEL_2_CLIENT_SECRET"),
-        System.getenv("CHANNEL_2_EMAIL")
+        Env.get("CHANNEL_1_CLIENT_ID"),
+        Env.get("CHANNEL_1_CLIENT_SECRET"),
+        Env.get("CHANNEL_1_EMAIL")
+      ),
+      "Channel_2", new ChannelConfig(
+        Env.get("CHANNEL_2_CLIENT_ID"),
+        Env.get("CHANNEL_2_CLIENT_SECRET"),
+        Env.get("CHANNEL_2_EMAIL")
       ),
       "Channel_3", new ChannelConfig(
-        System.getenv("CHANNEL_3_CLIENT_ID"),
-        System.getenv("CHANNEL_3_CLIENT_SECRET"),
-        System.getenv("CHANNEL_3_EMAIL")
+        Env.get("CHANNEL_3_CLIENT_ID"),
+        Env.get("CHANNEL_3_CLIENT_SECRET"),
+        Env.get("CHANNEL_3_EMAIL")
       ),
       "Channel_4", new ChannelConfig(
-        System.getenv("CHANNEL_4_CLIENT_ID"),
-        System.getenv("CHANNEL_4_CLIENT_SECRET"),
-        System.getenv("CHANNEL_4_EMAIL")
+        Env.get("CHANNEL_4_CLIENT_ID"),
+        Env.get("CHANNEL_4_CLIENT_SECRET"),
+        Env.get("CHANNEL_4_EMAIL")
       ),
       "Channel_5", new ChannelConfig(
-        System.getenv("CHANNEL_5_CLIENT_ID"),
-        System.getenv("CHANNEL_5_CLIENT_SECRET"),
-        System.getenv("CHANNEL_5_EMAIL")
+        Env.get("CHANNEL_5_CLIENT_ID"),
+        Env.get("CHANNEL_5_CLIENT_SECRET"),
+        Env.get("CHANNEL_5_EMAIL")
       )
-
-      // add more channels as needed...
+      // Add more channels as needed; remember to mirror the new keys in .env.
     );
    ScheduledExecutorService executor = Executors.newScheduledThreadPool(channels.size()+1);
     AtomicLong timeUntilNextCheck = new AtomicLong(15*60);

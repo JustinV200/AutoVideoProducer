@@ -14,8 +14,27 @@ import org.json.JSONObject;
 
 
 
+/**
+ * High-level façade that stitches together the individual steps required to
+ * produce a single short-form video:
+ *
+ * <ol>
+ *   <li>{@link #scriptWriter(String)} — ask GPT-4o (via {@link AIscraper})
+ *       to write the narration script.</li>
+ *   <li>{@link #voiceAct(String)} — call the OpenAI TTS endpoint and save
+ *       the audio to {@code vidRenderer/public/speech.mp3}.</li>
+ *   <li>{@link #generate_background(String)} — pick a random gameplay clip
+ *       and trim it to match the audio length via {@link background_generator}.</li>
+ *   <li>{@link #generate_captions()} — transcribe the speech with
+ *       {@link WhisperTranscriber} and emit a Remotion-friendly JSON file.</li>
+ * </ol>
+ *
+ * <p>The {@code OPENAI_API_KEY} is read through {@link Env} so it can be
+ * provided either via a {@code .env} file or a real environment variable.</p>
+ */
 public class VidBuilder {
-    static private final String API_KEY = System.getenv("OPENAI_API_KEY");
+    private static final String API_KEY = Env.get("OPENAI_API_KEY");
+    /** Default prompt used when {@link #scriptWriter()} is called with no theme. */
     private static final String prompt = "Search Social Media platforms for an interesting story/post, that would take under 45 seconds but over 20 seconds for a very slow text to speech bot to read, and restate it verbatim, from the perspective of the author, do this immediately, do not start with anything besides the title of the post, and end with the phrase: rememebr to like and subscribe!";
     private final HttpClient httpClient;
 
@@ -23,22 +42,34 @@ public class VidBuilder {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-  public SearchResult scriptWriter() {
+    /** Generates a script using the built-in default prompt. */
+    public SearchResult scriptWriter() {
         return generateResponse(prompt);
     }
 
-    // Overloaded method: script writer with customizable scripts
+    /**
+     * Generates a script using a caller-supplied prompt or theme.
+     *
+     * @param theme the complete prompt to send to GPT-4o
+     */
     public SearchResult scriptWriter(String theme) {
         return generateResponse(theme);
     }
 
-    //  common logic for overloaded methods
+    /** Shared implementation used by both {@code scriptWriter} overloads. */
     private SearchResult generateResponse(String userPrompt) {
         AIscraper searcher = new AIscraper();
-        SearchResult result = searcher.search(userPrompt);
-        return result;
+        return searcher.search(userPrompt);
     }
 
+    /**
+     * Picks a random background gameplay clip and trims it to match the
+     * current narration length, writing the result to
+     * {@code vidRenderer/public/backgroundclip.mp4}.
+     *
+     * @param Channel name of the channel being rendered (reserved for future
+     *                per-channel clip libraries; currently unused)
+     */
     public void generate_background(String Channel) {
         String chosenVideo = null;
         String[] videos = {
@@ -57,13 +88,26 @@ public class VidBuilder {
 
     }
 
-    public void generate_captions(){
-        saveRemotionCaptions(WhisperTranscriber.transcribe("vidRenderer\\public\\speech.mp3", API_KEY), "vidRenderer\\src\\remotion-captions.json");
+    /**
+     * Transcribes {@code speech.mp3} with Whisper and writes a Remotion-
+     * compatible captions JSON to {@code vidRenderer/src/remotion-captions.json}.
+     */
+    public void generate_captions() {
+        saveRemotionCaptions(
+            WhisperTranscriber.transcribe("vidRenderer\\public\\speech.mp3", API_KEY),
+            "vidRenderer\\src\\remotion-captions.json"
+        );
     }
 
-   
+    /**
+     * Synthesises narration audio for the given script using the OpenAI TTS
+     * endpoint and writes the MP3 to {@code vidRenderer/public/speech.mp3}.
+     * Scripts longer than 3000 characters are truncated to stay within the
+     * API limit.
+     *
+     * @param script narration text to be spoken aloud
+     */
     @SuppressWarnings("UseSpecificCatch")
-    //generates speech.mp3
     public void voiceAct(String script) {
     try {
         if (script.length() > 3000) {
@@ -92,10 +136,14 @@ public class VidBuilder {
 }
 
 
-private String toJsonString(String text) {
-    return "\"" + text.replace("\"", "\\\"") + "\"";
-}
-
+/**
+ * Converts the verbose-JSON response from Whisper into the compact
+ * {@code [{start,end,text}]} array format consumed by the Remotion
+ * composition, and writes it to {@code outputPath}.
+ *
+ * @param jsonResponse raw Whisper verbose-JSON response body
+ * @param outputPath   destination path for the generated captions file
+ */
 public static void saveRemotionCaptions(String jsonResponse, String outputPath) {
     try {
         JSONObject root = new JSONObject(jsonResponse);
